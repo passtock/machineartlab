@@ -1,5 +1,12 @@
-".pio/" 
-".vscode/" 
+# PlatformIO build output
+.pio/
+**/.pio/
+*.tmp
 
+# VS Code
+.vscode/
+**/.vscode/
+
+# Python cache
 __pycache__/
 *.pyc
