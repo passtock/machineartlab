@@ -27,47 +27,27 @@
 
 // =================================================================================
 // [보드 선택] 자신이 가진 보드의 주석(#define)을 1개만 활성화하세요!
-// 기본값: 가장 많이 쓰이는 Sunton ESP32-8048S043 (4.3인치 800x480 RGB 디스플레이)
 // =================================================================================
-#define BOARD_SUNTON_8048S043      // 4.3인치 800x480 (Sunton ESP32-S3)
-// #define BOARD_SUNTON_8048S050   // 5.0인치 800x480 (Sunton ESP32-S3)
-// #define BOARD_SUNTON_8048S070   // 7.0인치 800x480 (Sunton ESP32-S3)
-// #define BOARD_LILYGO_T_DISPLAY_S3 // LilyGO T-Display-S3 (1.9인치 170x320)
-// #define BOARD_GENERIC_SPI_ST7789 // 일반 SPI ST7789 디스플레이
-
+// 디스플레이 객체 설정 (VIEWESMART UEDX80480043E-WB 공식 규격)
+// LCD IC: ST7262 (800x480 RGB 16-bit)
 // =================================================================================
-// 디스플레이 객체 설정
-// =================================================================================
-#if defined(BOARD_SUNTON_8048S043) || defined(BOARD_SUNTON_8048S050) || defined(BOARD_SUNTON_8048S070)
-  // Sunton 4.3" / 5.0" / 7.0" 800x480 RGB 인터페이스 핀맵
-  #define TFT_BL 2 // 백라이트 제어 핀
+#define TFT_BL 2 // 백라이트 제어 핀 (GPIO 2)
 
-  Arduino_ESP32RGBPanel *bus = new Arduino_ESP32RGBPanel(
-      40 /* DE */, 41 /* VSYNC */, 39 /* HSYNC */, 42 /* PCLK */,
-      45 /* R0 */, 48 /* R1 */, 47 /* R2 */, 21 /* R3 */, 14 /* R4 */,
-      5  /* G0 */, 6  /* G1 */, 7  /* G2 */, 15 /* G3 */, 16 /* G4 */, 4 /* G5 */,
-      8  /* B0 */, 3  /* B1 */, 46 /* B2 */, 9  /* B3 */, 1  /* B4 */,
-      0 /* hsync_polarity */, 8 /* hsync_front_porch */, 4 /* hsync_pulse_width */, 8 /* hsync_back_porch */,
-      0 /* vsync_polarity */, 8 /* vsync_front_porch */, 4 /* vsync_pulse_width */, 8 /* vsync_back_porch */
-  );
-  Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
-      800 /* width */, 480 /* height */, bus, 0 /* rotation */, true /* auto_flush */
-  );
+Arduino_ESP32RGBPanel *bus = new Arduino_ESP32RGBPanel(
+    40 /* DE */, 41 /* VSYNC */, 39 /* HSYNC */, 42 /* PCLK */,
+    45 /* R0 */, 48 /* R1 */, 47 /* R2 */, 21 /* R3 */, 14 /* R4 */,
+    5  /* G0 */, 6  /* G1 */, 7  /* G2 */, 15 /* G3 */, 16 /* G4 */, 4 /* G5 */,
+    8  /* B0 */, 3  /* B1 */, 46 /* B2 */, 9  /* B3 */, 1  /* B4 */,
+    0  /* hsync_polarity */, 20 /* hsync_front_porch (HFP) */, 1 /* hsync_pulse_width (HPW) */, 42 /* hsync_back_porch (HBP) */,
+    0  /* vsync_polarity */, 4  /* vsync_front_porch (VFP) */, 10 /* vsync_pulse_width (VPW) */, 12 /* vsync_back_porch (VBP) */,
+    1  /* pclk_active_neg */, 15000000 /* prefer_speed (15MHz) */
+);
 
-#elif defined(BOARD_LILYGO_T_DISPLAY_S3)
-  #define TFT_BL 38
-  Arduino_DataBus *bus = new Arduino_ESP32LCD8(
-      7 /* DC */, 6 /* CS */, 8 /* WR */, 9 /* RD */,
-      39 /* D0 */, 40 /* D1 */, 41 /* D2 */, 42 /* D3 */,
-      45 /* D4 */, 46 /* D5 */, 47 /* D6 */, 48 /* D7 */
-  );
-  Arduino_GFX *gfx = new Arduino_ST7789(bus, 5 /* RST */, 0 /* rotation */, true /* IPS */, 170, 320);
+Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
+    800 /* width */, 480 /* height */, bus, 0 /* rotation */, true /* auto_flush */
+);
 
-#else // 기본 폴백: 일반 SPI 디스플레이
-  #define TFT_BL 2
-  Arduino_DataBus *bus = new Arduino_HWSPI(11 /* DC */, 10 /* CS */, 12 /* SCK */, 13 /* MOSI */, -1 /* MISO */);
-  Arduino_GFX *gfx = new Arduino_ST7789(bus, 1 /* RST */, 0 /* rotation */, true /* IPS */, 240, 320);
-#endif
+
 
 // =================================================================================
 // 전역 변수
