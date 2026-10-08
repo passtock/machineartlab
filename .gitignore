@@ -10,3 +10,9 @@
 # Python cache
 __pycache__/
 *.pyc
+
+# Exclude files > 100MB to prevent GitHub push error
+models/Plate2_Seated_Persons_x11.stl
+models/Plate_Chair_with_Seated_Person_Rotated90_x11.stl
+models/Plate_Chair_with_Seated_Person_x11.stl
+models/plates/
