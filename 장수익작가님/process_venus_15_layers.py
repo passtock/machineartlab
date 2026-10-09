@@ -11,34 +11,35 @@ def process_all_layers():
     out_dir = os.path.join(script_dir, "비너스_15등분_교대가공")
     os.makedirs(out_dir, exist_ok=True)
     
-    print("=" * 70)
-    print("Venus 15 Layers Generator - Genuine M8 Screw Threads (+0.15mm 3D Print Tolerance)")
-    print("=" * 70)
+    print("=" * 75)
+    print("Venus 15 Layers Generator - M16 Genuine Threads (2x Scale) & Unified Ø30mm Alignment")
+    print("=" * 75)
     
-    # Layer Specifications: Z bounds and Big Clearance Hole parameters
-    # Even layers (2, 4, 6, 8, 10, 12, 14): Big hole on LEFT (-26.0, 0.6) | Bolt on RIGHT (21.7, -0.05)
-    # Odd layers (3, 5, 7, 9, 11, 13, 15): Big hole on RIGHT (21.5, 0.1)  | Bolt on LEFT (-26.0, 0.5)
-    # Special Layer 1: No big hole, blind bolt on LEFT bored halfway from bottom (Z <= 221.5mm)
-    # Special Layer 2: Big hole on LEFT (Ø23.5mm), blind bolt on RIGHT bored halfway from bottom (Z <= 198.15mm)
+    # Coaxial Axis Definitions across all 15 layers:
+    # LEFT AXIS:  X = -26.0, Y = 0.5  (Even layers: Ø30mm Big Hole | Odd layers: M16 Bolt)
+    # RIGHT AXIS: X =  21.5, Y = 0.0  (Odd layers: Ø30mm Big Hole  | Even layers: M16 Bolt)
+    # UNIFIED BIG HOLE DIAMETER: Ø30.0mm (Guarantees seamless continuous cylinder when all 15 assembled)
+    # BOLT DIAMETER: M16 (Original M8 scaled 2x to Ø16.0mm, +0.15mm radial print tolerance)
+    
     layer_configs = {
         1:  {"z": (213.014, 230.150), "side": None,    "cx":   0.0, "cy": 0.0, "dia":  0.0},
-        2:  {"z": (190.150, 206.238), "side": "LEFT",  "cx": -26.0, "cy": 0.6, "dia": 23.5},
-        3:  {"z": (165.708, 182.780), "side": "RIGHT", "cx":  21.5, "cy": 0.1, "dia": 70.0},
-        4:  {"z": (142.326, 158.417), "side": "LEFT",  "cx": -26.0, "cy": 0.6, "dia": 70.0},
-        5:  {"z": (122.311, 139.383), "side": "RIGHT", "cx":  21.5, "cy": 0.1, "dia": 70.0},
-        6:  {"z": ( 94.503, 110.591), "side": "LEFT",  "cx": -26.0, "cy": 0.6, "dia": 70.0},
-        7:  {"z": ( 71.562,  88.634), "side": "RIGHT", "cx":  21.5, "cy": 0.1, "dia": 50.0},
-        8:  {"z": ( 46.680,  62.775), "side": "LEFT",  "cx": -26.0, "cy": 0.6, "dia": 70.0},
-        9:  {"z": ( 20.813,  37.885), "side": "RIGHT", "cx":  21.5, "cy": 0.1, "dia": 60.0},
-        10: {"z": ( -1.144,  14.944), "side": "LEFT",  "cx": -26.0, "cy": 0.6, "dia": 53.0},
-        11: {"z": (-29.935, -12.863), "side": "RIGHT", "cx":  21.5, "cy": 0.1, "dia": 43.0},
-        12: {"z": (-48.967, -32.879), "side": "LEFT",  "cx": -26.0, "cy": 0.6, "dia": 44.0},
-        13: {"z": (-73.722, -56.650), "side": "RIGHT", "cx":  21.5, "cy": 0.1, "dia": 51.0},
-        14: {"z": (-96.790, -80.702), "side": "LEFT",  "cx": -26.0, "cy": 0.6, "dia": 31.0},
-        15: {"z": (-121.539,-104.467), "side": "RIGHT", "cx":  21.5, "cy": 0.1, "dia": 58.0},
+        2:  {"z": (190.150, 206.238), "side": "LEFT",  "cx": -26.0, "cy": 0.5, "dia": 30.0},
+        3:  {"z": (165.708, 182.780), "side": "RIGHT", "cx":  21.5, "cy": 0.0, "dia": 30.0},
+        4:  {"z": (142.326, 158.417), "side": "LEFT",  "cx": -26.0, "cy": 0.5, "dia": 30.0},
+        5:  {"z": (122.311, 139.383), "side": "RIGHT", "cx":  21.5, "cy": 0.0, "dia": 30.0},
+        6:  {"z": ( 94.503, 110.591), "side": "LEFT",  "cx": -26.0, "cy": 0.5, "dia": 30.0},
+        7:  {"z": ( 71.562,  88.634), "side": "RIGHT", "cx":  21.5, "cy": 0.0, "dia": 30.0},
+        8:  {"z": ( 46.680,  62.775), "side": "LEFT",  "cx": -26.0, "cy": 0.5, "dia": 30.0},
+        9:  {"z": ( 20.813,  37.885), "side": "RIGHT", "cx":  21.5, "cy": 0.0, "dia": 30.0},
+        10: {"z": ( -1.144,  14.944), "side": "LEFT",  "cx": -26.0, "cy": 0.5, "dia": 30.0},
+        11: {"z": (-29.935, -12.863), "side": "RIGHT", "cx":  21.5, "cy": 0.0, "dia": 30.0},
+        12: {"z": (-48.967, -32.879), "side": "LEFT",  "cx": -26.0, "cy": 0.5, "dia": 30.0},
+        13: {"z": (-73.722, -56.650), "side": "RIGHT", "cx":  21.5, "cy": 0.0, "dia": 30.0},
+        14: {"z": (-96.790, -80.702), "side": "LEFT",  "cx": -26.0, "cy": 0.5, "dia": 30.0},
+        15: {"z": (-121.539,-104.467), "side": "RIGHT", "cx":  21.5, "cy": 0.0, "dia": 30.0},
     }
 
-    # Load Master Meshes (1.obj, 2.obj, 볼트.obj)
+    # 1. Load Master Meshes (1.obj, 2.obj, 볼트.obj)
     print("[1/3] Loading Master Meshes (1.obj, 2.obj, 볼트.obj)...")
     t_load = time.time()
     tm1 = trimesh.load(os.path.join(script_dir, "1.obj"), force="mesh")
@@ -49,33 +50,48 @@ def process_all_layers():
     m2_master = Manifold(Mesh(vert_properties=np.ascontiguousarray(tm2.vertices, dtype=np.float32), 
                              tri_verts=np.ascontiguousarray(tm2.faces, dtype=np.uint32)))
 
-    # Load Bolt and apply +0.15mm radial tolerance (FDM clearance)
+    # 2. Scale Bolt 2x (M8 -> M16) & Apply +0.15mm Radial Clearance Tolerance
     bolt = trimesh.load(os.path.join(script_dir, "볼트.obj"), force="mesh")
     cx0, cy0 = -18.896184, 0.0
+    
+    # Save Male M16 Bolt for reference and 3D printing
+    v_male = bolt.vertices.copy()
+    v_male[:,0] = cx0 + (v_male[:,0] - cx0) * 2.0
+    v_male[:,1] = cy0 + (v_male[:,1] - cy0) * 2.0
+    v_male[:,2] = v_male[:,2] * 2.0
+    male_bolt_mesh = trimesh.Trimesh(vertices=v_male, faces=bolt.faces, process=False)
+    male_bolt_mesh.export(os.path.join(script_dir, "볼트_M16.obj"))
+    male_bolt_mesh.export(os.path.join(script_dir, "볼트_M16.stl"))
+    print("      Exported matching print-ready male bolt: 볼트_M16.obj / 볼트_M16.stl")
+
+    # Female Thread Cutter: 2x scale + 0.15mm radial tolerance
     v_bolt = bolt.vertices.copy()
-    dx = v_bolt[:,0] - cx0
-    dy = v_bolt[:,1] - cy0
+    dx = (v_bolt[:,0] - cx0) * 2.0
+    dy = (v_bolt[:,1] - cy0) * 2.0
+    dz = v_bolt[:,2] * 2.0
+    
     r = np.hypot(dx, dy)
     delta_r = 0.15
-    v_bolt[:,0] += (dx / r) * delta_r
-    v_bolt[:,1] += (dy / r) * delta_r
+    v_bolt[:,0] = cx0 + dx + (dx / r) * delta_r
+    v_bolt[:,1] = cy0 + dy + (dy / r) * delta_r
+    v_bolt[:,2] = dz
 
-    # Left Thread Cutter: X = -26.0, Y = +0.5
+    # Left Thread Cutter (Coaxial at X = -26.0, Y = +0.5)
     v_left = v_bolt.copy()
     v_left[:,0] += (-26.0 - cx0)
     v_left[:,1] += (0.5 - cy0)
     m_bolt_left = Manifold(Mesh(vert_properties=np.ascontiguousarray(v_left, dtype=np.float32), 
                                 tri_verts=np.ascontiguousarray(bolt.faces, dtype=np.uint32)))
 
-    # Right Thread Cutter: X = +21.7, Y = -0.05
+    # Right Thread Cutter (Coaxial at X = +21.5, Y = 0.0)
     v_right = v_bolt.copy()
-    v_right[:,0] += (21.7 - cx0)
-    v_right[:,1] += (-0.05 - cy0)
+    v_right[:,0] += (21.5 - cx0)
+    v_right[:,1] += (0.0 - cy0)
     m_bolt_right = Manifold(Mesh(vert_properties=np.ascontiguousarray(v_right, dtype=np.float32), 
                                  tri_verts=np.ascontiguousarray(bolt.faces, dtype=np.uint32)))
 
-    print(f"      Master meshes & thread cutters loaded successfully in {time.time()-t_load:.2f}s.")
-    print("[2/3] Processing 15 layers with genuine M8 threads & big clearance holes...")
+    print(f"      Master meshes & M16 thread cutters ready in {time.time()-t_load:.2f}s.")
+    print("[2/3] Processing 15 layers with M16 threads & unified matching Ø30mm big holes...")
 
     layer_meshes = []
 
@@ -90,13 +106,13 @@ def process_all_layers():
         l_right = m2_master ^ box_layer
         
         out_bodies = []
+        r_big = 15.0 # Ø30mm radius = 15mm
         
         if i == 1:
             # Layer 1: Skull Top Crown
-            # No big hole.
+            # No big hole (keeps top solid).
             # Blind bolt on Left bored halfway from bottom (Z in [213.014, 221.5]).
-            # Top half (Z > 221.5) remains 100% solid inside the skull (ZERO protrusion).
-            trim_box = Manifold.cube([60, 60, 221.5 - (z_min - 10.0)]).translate([-56, -30, z_min - 10.0])
+            trim_box = Manifold.cube([80, 80, 221.5 - (z_min - 10.0)]).translate([-66, -40, z_min - 10.0])
             blind_cutter = m_bolt_left ^ trim_box
             l1_left_threaded = l_left - blind_cutter
             
@@ -104,14 +120,12 @@ def process_all_layers():
             out_bodies.append(l_right)
             
         elif i == 2:
-            # Layer 2: Big hole on LEFT (Ø23.5mm). Blind bolt on RIGHT (halfway).
-            r_big = cfg["dia"] / 2.0
-            big_hole = Manifold.cylinder(height=layer_h + 10.0, radius_low=r_big, radius_high=r_big, circular_segments=64)
+            # Layer 2: Big hole on LEFT (Ø30.0mm). Blind bolt on RIGHT (halfway up to 198.15mm).
+            big_hole = Manifold.cylinder(height=layer_h + 10.0, radius_low=r_big, radius_high=r_big, circular_segments=128)
             big_hole = big_hole.translate([cfg["cx"], cfg["cy"], z_min - 5.0])
             l2_left_cut = l_left - big_hole
             
-            # Blind bolt on RIGHT bored halfway from bottom (Z from 190.15 up to 198.15)
-            trim_box = Manifold.cube([60, 60, 198.15 - (z_min - 10.0)]).translate([0, -30, z_min - 10.0])
+            trim_box = Manifold.cube([80, 80, 198.15 - (z_min - 10.0)]).translate([-20, -40, z_min - 10.0])
             blind_cutter = m_bolt_right ^ trim_box
             l2_right_threaded = l_right - blind_cutter
             
@@ -121,19 +135,17 @@ def process_all_layers():
         else:
             # Layers 3 ~ 15:
             if i % 2 == 1:
-                # Odd layer: LEFT is M8 thread through-hole, RIGHT is Big Hole
+                # Odd layer: LEFT is M16 thread through-hole, RIGHT is Ø30mm Big Hole
                 l_left_threaded = l_left - m_bolt_left
-                r_big = cfg["dia"] / 2.0
-                big_hole = Manifold.cylinder(height=layer_h + 10.0, radius_low=r_big, radius_high=r_big, circular_segments=64)
+                big_hole = Manifold.cylinder(height=layer_h + 10.0, radius_low=r_big, radius_high=r_big, circular_segments=128)
                 big_hole = big_hole.translate([cfg["cx"], cfg["cy"], z_min - 5.0])
                 l_right_cut = l_right - big_hole
                 
                 out_bodies.append(l_left_threaded)
                 out_bodies.append(l_right_cut)
             else:
-                # Even layer: LEFT is Big Hole, RIGHT is M8 thread through-hole
-                r_big = cfg["dia"] / 2.0
-                big_hole = Manifold.cylinder(height=layer_h + 10.0, radius_low=r_big, radius_high=r_big, circular_segments=64)
+                # Even layer: LEFT is Ø30mm Big Hole, RIGHT is M16 thread through-hole
+                big_hole = Manifold.cylinder(height=layer_h + 10.0, radius_low=r_big, radius_high=r_big, circular_segments=128)
                 big_hole = big_hole.translate([cfg["cx"], cfg["cy"], z_min - 5.0])
                 l_left_cut = l_left - big_hole
                 l_right_threaded = l_right - m_bolt_right
@@ -162,8 +174,8 @@ def process_all_layers():
         file_size_mb = os.path.getsize(out_path_obj) / (1024 * 1024)
         
         side_desc = f"{cfg['side']} Ø{cfg['dia']:.1f}mm" if cfg['side'] else "NO Big Hole"
-        bolt_desc = "Blind (half)" if i in [1, 2] else "Through M8"
-        print(f"[{i:02d}/15] {out_name_obj:14s} | Big Hole: {side_desc:16s} | Bolt: {bolt_desc:14s} | Faces: {len(combined_mesh.faces):6d} | Size: {file_size_mb:.2f}MB ({elapsed:.2f}s)")
+        bolt_desc = "Blind M16 (half)" if i in [1, 2] else "Through M16"
+        print(f"[{i:02d}/15] {out_name_obj:14s} | Big Hole: {side_desc:16s} | Bolt: {bolt_desc:16s} | Faces: {len(combined_mesh.faces):6d} | Size: {file_size_mb:.2f}MB ({elapsed:.2f}s)")
         
     # Generate Integrated Assembly and Exploded Views
     print("\n[3/3] Generating Integrated Assembly & 10mm Exploded View...")
@@ -180,10 +192,10 @@ def process_all_layers():
     exploded_mesh.export(os.path.join(out_dir, "비너스_15등분_간격전개_10mm.obj"))
     exploded_mesh.export(os.path.join(out_dir, "비너스_15등분_간격전개_10mm.stl"))
     
-    print("\n" + "=" * 70)
+    print("\n" + "=" * 75)
     print(f"All 15 layers & assemblies generated successfully in {time.time() - t_start:.2f}s!")
     print(f"Output directory: {os.path.abspath(out_dir)}")
-    print("=" * 70)
+    print("=" * 75)
 
 if __name__ == "__main__":
     process_all_layers()
