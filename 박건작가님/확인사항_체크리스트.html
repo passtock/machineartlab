@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>배선 확인 체크리스트</title>
+<style>
+:root{
+  --bg:#f7f7f5; --card:#ffffff; --ink:#1d1f23; --muted:#626873; --line:#d9dbe0; --accent:#1f4fa8;
+  --warn-bg:#fff4e0; --warn-ink:#8a4b00; --ok-bg:#e9f7ee; --ok-ink:#1e6b3a; --done:#2b8a3e;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15171b; --card:#1d2026; --ink:#e7e9ee; --muted:#9aa1ad; --line:#323743; --accent:#7aa2ff;
+    --warn-bg:#3a2c12; --warn-ink:#ffd18a; --ok-bg:#16301f; --ok-ink:#9fe0b5; --done:#69db7c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15171b; --card:#1d2026; --ink:#e7e9ee; --muted:#9aa1ad; --line:#323743; --accent:#7aa2ff;
+  --warn-bg:#3a2c12; --warn-ink:#ffd18a; --ok-bg:#16301f; --ok-ink:#9fe0b5; --done:#69db7c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+main{max-width:920px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:19px;margin:34px 0 6px;padding-bottom:6px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+h2 .cnt{font-size:13px;color:var(--muted);font-weight:500}
+.sub{color:var(--muted);margin:0 0 14px}
+a{color:var(--accent)}
+.bar{height:8px;background:var(--line);border-radius:999px;overflow:hidden;margin:10px 0 4px}
+.bar i{display:block;height:100%;width:0;background:var(--done);transition:width .2s}
+.item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0;display:grid;grid-template-columns:24px 1fr;gap:4px 10px}
+.item.done{opacity:.62}
+.item.done .ttl{text-decoration:line-through}
+.item input[type=checkbox]{width:18px;height:18px;margin:3px 0 0;accent-color:var(--done)}
+.ttl{font-weight:700}
+.why,.how,.ifnot{grid-column:2;font-size:14px}
+.why{color:var(--muted)}
+.how b,.ifnot b{font-weight:700}
+.ifnot{color:var(--warn-ink);background:var(--warn-bg);border-radius:8px;padding:6px 10px;margin-top:4px}
+.rec{grid-column:2;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px;font-size:13px;color:var(--muted)}
+.rec input[type=text]{flex:1;min-width:140px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+code{font-family:ui-monospace,Consolas,monospace;font-size:13px;background:color-mix(in srgb,var(--card) 80%,var(--line));padding:1px 5px;border-radius:4px}
+pre{grid-column:2;margin:6px 0 0;padding:10px 12px;background:color-mix(in srgb,var(--card) 85%,var(--line));border-radius:8px;overflow-x:auto;font:12.5px/1.5 ui-monospace,Consolas,monospace}
+.tag{display:inline-block;font-size:11.5px;padding:0 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-left:6px;vertical-align:1px;font-weight:500}
+.tag.must{border-color:#e03131;color:#e03131}
+.note{border-radius:10px;padding:12px 14px;margin:10px 0}
+.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+button{font:inherit;font-size:13px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:5px 12px;cursor:pointer}
+@media print{.tools{display:none}.item{break-inside:avoid}}
+</style>
+</head>
+<body>
+<main>
+<h1>배선 확인 체크리스트</h1>
+<p class="sub">VIEWE UEDX80480043E-WB-B · 펌웨어 <code>Interactive_VIEWE/</code> · 배선도는 <a href="배선표_및_다이어그램.html">배선표_및_다이어그램.html</a></p>
+
+<div class="note ok">문서 기준으로 설계는 맞춰 두었지만, 아래 항목은 <b>실물에서만 확인할 수 있는 것들</b>입니다. 위에서부터 순서대로 진행하세요. 체크 표시와 기록한 값은 이 브라우저에 저장됩니다.</div>
+<div class="bar"><i id="prog"></i></div>
+<div class="sub" id="progtxt"></div>
+<div class="tools"><button type="button" onclick="window.print()">인쇄 / PDF 저장</button><button type="button" id="reset">체크 초기화</button></div>
+
+<!-- ============================================================ -->
+<h2>A. 부품 실물 확인 (배선 전) <span class="cnt" data-sec="A"></span></h2>
+
+<div class="item" data-sec="A"><input type="checkbox" id="a1">
+  <label class="ttl" for="a1">보드 모델이 WB-B인지 <span class="tag">확인 완료</span></label>
+  <div class="why">헤더 21번(5V/VBUS) 핀은 WB-B에만 있습니다.</div>
+  <div class="how"><b>방법:</b> 보드 뒷면 상단의 <code>UEDX80480043E-WB-B</code> 인쇄를 확인하고, J2/J3 헤더가 21핀(맨 아래 VBUS / 5V)인지 봅니다.</div>
+</div>
+
+<div class="item" data-sec="A"><input type="checkbox" id="a2">
+  <label class="ttl" for="a2">2.8" ST7789 모듈의 핀 이름과 전원 사양 <span class="tag must">필수</span></label>
+  <div class="why">제조사마다 핀 이름이 다르고, 5V 전용인지 3.3V도 되는지에 따라 VCC 연결이 달라집니다.</div>
+  <div class="how"><b>방법:</b> 모듈 뒷면 실크와 제품 설명서에서 다음을 확인합니다.<br>
+  · VCC 허용 전압 (5V만 / 3.3~5V)<br>
+  · <code>CS</code> 핀이 있는지 (없는 모듈이면 버스 공유 불가)<br>
+  · <code>DC</code>(RS/A0), <code>RESET</code>(RST), <code>LED</code>(BLK/BL) 핀 이름<br>
+  · 온보드 3.3V 레귤레이터/레벨시프터 칩 유무</div>
+  <div class="ifnot"><b>CS 핀이 없으면:</b> SD·MAX7219와 버스를 공유할 수 없으니 바로 알려주세요(배선 재설계 필요). <b>LED 핀이 5V 전용이면</b> 3.3V 대신 5V 레일에 연결합니다.</div>
+  <div class="rec">기록 <input type="text" data-rec="a2" placeholder="예) VCC 3.3~5V, 핀: GND VCC SCL SDA RES DC CS BLK"></div>
+</div>
+
+<div class="item" data-sec="A"><input type="checkbox" id="a3">
+  <label class="ttl" for="a3">MAX7219 모듈 핀 구성</label>
+  <div class="how"><b>방법:</b> 입력 쪽 5핀이 <code>VCC GND DIN CS CLK</code>인지 확인합니다. 반대쪽의 출력 핀(DOUT)은 연결하지 않습니다.</div>
+  <div class="rec">기록 <input type="text" data-rec="a3" placeholder="예) VCC GND DIN CS CLK 확인"></div>
+</div>
+
+<div class="item" data-sec="A"><input type="checkbox" id="a4">
+  <label class="ttl" for="a4">HX711 전원 핀 구조와 로드셀 선 색</label>
+  <div class="why">일부 HX711 모듈은 <code>VCC</code>(아날로그)와 <code>VDD</code>(디지털)가 나뉘어 있습니다.</div>
+  <div class="how"><b>방법:</b> 핀이 <code>GND DT SCK VCC</code> 4개면 VCC를 3.3V에 연결합니다. <code>VDD</code>가 따로 있으면 VCC와 VDD 둘 다 3.3V에 연결합니다. 로드셀 4선 색과 E+/E-/A-/A+ 대응은 키트 설명서로 확인합니다.</div>
+  <div class="rec">기록 <input type="text" data-rec="a4" placeholder="예) 빨E+ 검E- 흰A- 초A+"></div>
+</div>
+
+<div class="item" data-sec="A"><input type="checkbox" id="a5">
+  <label class="ttl" for="a5">어댑터와 케이블 사양</label>
+  <div class="how"><b>방법:</b> 어댑터 라벨이 <b>5V ⎓ 2A 이상</b>인지 봅니다. 케이블은 USB-C(또는 A→C)로 보드 <b>UART</b> 포트에 꽂습니다. 업로드할 때는 데이터 전송이 되는 케이블이어야 합니다.</div>
+  <div class="rec">기록 <input type="text" data-rec="a5" placeholder="예) 5V 3A, C-to-C 1m"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2>B. 멀티미터 측정 (부품 연결 전) <span class="cnt" data-sec="B"></span></h2>
+
+<div class="item" data-sec="B"><input type="checkbox" id="b1">
+  <label class="ttl" for="b1">J3 21번 '5V' 전압 <span class="tag must">필수</span></label>
+  <div class="why">가지고 있는 회로도는 헤더 20핀 버전이라 21번 핀이 도면에 나오지 않습니다. MAX7219와 ST7789 전원을 여기서 가져갑니다.</div>
+  <div class="how"><b>방법:</b> 어댑터를 UART 포트에 꽂아 보드를 켭니다. 멀티미터 DC V 모드로 빨간 리드는 J3 <code>'5V'</code>(맨 아래), 검은 리드는 J3 <code>'GND'</code>(그 위)에 댑니다.<br><b>정상:</b> 4.7 ~ 5.2V</div>
+  <div class="ifnot"><b>0V이거나 값이 이상하면:</b> 이 핀은 쓰지 말고, 5V를 어댑터에서 직접 분기합니다(USB-C 터미널 분기 어댑터 등). GND는 보드와 공통으로 묶습니다.</div>
+  <div class="rec">측정값 <input type="text" data-rec="b1" placeholder="___ V"></div>
+</div>
+
+<div class="item" data-sec="B"><input type="checkbox" id="b2">
+  <label class="ttl" for="b2">J2 1번 / J3 19번 '3.3V' 전압</label>
+  <div class="how"><b>방법:</b> 같은 방법으로 <code>'3.3V'</code>–<code>'GND'</code> 사이를 잽니다. <b>정상:</b> 3.2 ~ 3.4V</div>
+  <div class="rec">측정값 <input type="text" data-rec="b2" placeholder="J2: ___ V / J3: ___ V"></div>
+</div>
+
+<div class="item" data-sec="B"><input type="checkbox" id="b3">
+  <label class="ttl" for="b3">J2 14번 '18' 핀이 GPIO18과 연결되는지 <span class="tag">선택 · 부저용</span></label>
+  <div class="why">회로도상 이 핀은 터치 INT(CTP_INT)이고, GPIO18과는 R33(미장착일 수 있음)을 거쳐야 연결됩니다. 연결되어 있으면 부저를 달 수 있습니다.</div>
+  <div class="how"><b>방법:</b> 이 핀에는 3.3V 풀업 저항이 있습니다. 그래서 아래 테스트 코드로 GPIO18을 LOW로 내린 뒤 J2 14번 전압을 재면 됩니다.<br>
+  <b>0V 근처</b> → 연결됨(부저 가능) · <b>3.3V 근처</b> → 미연결</div>
+<pre>// Arduino IDE 또는 PlatformIO 새 프로젝트에 넣고 업로드
+void setup() { pinMode(18, OUTPUT); digitalWrite(18, LOW); }
+void loop() {}</pre>
+  <div class="ifnot"><b>연결되어 있으면:</b> <code>include/pins.h</code>에서 <code>PIN_BUZZER = 18</code>로 바꾸고, 패시브 부저를 J2 14번과 GND 사이에 연결합니다.</div>
+  <div class="rec">측정값 <input type="text" data-rec="b3" placeholder="___ V → 연결됨 / 미연결"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2>C. 단계별 동작 확인 (하나씩 연결하며) <span class="cnt" data-sec="C"></span></h2>
+<p class="sub">부품을 꽂거나 뺄 때는 반드시 USB를 뽑은 상태에서 합니다.</p>
+
+<div class="item" data-sec="C"><input type="checkbox" id="c1">
+  <label class="ttl" for="c1">① 보드만 — 업로드와 4.3" 화면</label>
+  <div class="how"><b>방법:</b> <code>Interactive_VIEWE</code>를 업로드하고 시리얼 모니터(115200)를 엽니다.<br>
+  <b>정상:</b> 4.3" 화면에 "Interactive Art Lab" 문구가 뜹니다. SD카드가 없으면 빨간 <code>SD Card Error!</code>가 뜨는데 이것도 정상입니다. 시리얼에 <code>[HX711] 응답 없음</code>이 나오는 것도 지금은 정상입니다.</div>
+  <div class="ifnot"><b>화면이 흔들리거나 밀리거나 줄무늬가 생기면:</b> <code>lgfx_displays.h</code>에서 <code>freq_write</code>를 15MHz에서 12MHz로 낮춥니다. <b>화면이 아예 검으면:</b> 시리얼 로그를 캡처해 공유해 주세요.</div>
+  <div class="rec">결과 <input type="text" data-rec="c1" placeholder="예) 정상 / 깜빡임 있음"></div>
+</div>
+
+<div class="item" data-sec="C"><input type="checkbox" id="c2">
+  <label class="ttl" for="c2">② MicroSD — 사진 표시</label>
+  <div class="how"><b>방법:</b> 카드를 FAT32로 포맷하고 루트에 <code>images</code> 폴더를 만든 뒤 JPEG를 넣습니다(800×480 권장, 최대 200장). 리셋합니다.<br>
+  <b>정상:</b> 사진이 뜨고, 시리얼에 <code>[SD] 이미지 N장 등록</code>과 렌더링 시간(ms)이 찍힙니다.</div>
+  <div class="ifnot"><b>마운트 실패:</b> 32GB 이하 카드로 FAT32 포맷을 다시 하세요. <b>사진이 깨지면:</b> 프로그레시브 JPEG일 수 있으니 '기본(baseline)' JPEG로 다시 저장하세요.</div>
+  <div class="rec">렌더링 시간 <input type="text" data-rec="c2" placeholder="___ ms / ___장"></div>
+</div>
+
+<div class="item" data-sec="C"><input type="checkbox" id="c3">
+  <label class="ttl" for="c3">③ 2.8" ST7789 — 표시와 SD 공존 <span class="tag must">핵심</span></label>
+  <div class="why">이 설계에서 가장 검증이 필요한 부분입니다. SD카드와 SPI 버스를 실제로 나눠 써도 둘 다 동작하는지 확인합니다.</div>
+  <div class="how"><b>방법:</b> ST7789를 연결하고 리셋합니다.<br>
+  <b>정상:</b> 상단 "MACHINE ART LAB" 헤더와 <code>READY</code>, 오른쪽 위 <code>SD N img</code>가 표시되고, <b>4.3" 화면에도 사진이 계속 뜹니다.</b></div>
+  <div class="ifnot">
+  · 색이 반전됨 → <code>invert = false</code><br>
+  · 빨강·파랑이 바뀜 → <code>rgb_order = true</code><br>
+  · 화면이 거꾸로 → <code>main.cpp</code>의 <code>setRotation(1)</code>을 <code>3</code>으로<br>
+  · 화면 일부가 지글거림 → <code>offset_x/offset_y</code> 조정(모듈 사양 확인)<br>
+  · <b>ST7789를 연결한 뒤 SD가 실패하면</b> → ST7789의 SDO/MISO가 연결되어 있지 않은지 먼저 확인하고, 그래도 안 되면 로그와 함께 알려주세요.</div>
+  <div class="rec">결과 <input type="text" data-rec="c3" placeholder="예) 정상, invert 변경함"></div>
+</div>
+
+<div class="item" data-sec="C"><input type="checkbox" id="c4">
+  <label class="ttl" for="c4">④ MAX7219 — 숫자 표시</label>
+  <div class="how"><b>방법:</b> MAX7219를 연결하고 리셋합니다.<br><b>정상:</b> 부팅할 때 <code>88888888</code>이 나온 뒤 <code>--------</code>로 바뀝니다.</div>
+  <div class="ifnot">
+  · 아무것도 안 켜지거나 숫자가 깨짐 → 3.3V 신호 레벨 문제일 가능성이 큽니다. DIN·CLK·CS 3가닥에 <b>74AHCT125</b> 레벨시프터를 넣습니다.<br>
+  · 자리 순서가 반대 → 알려주세요(코드에서 뒤집기)<br>
+  · 너무 밝거나 어두움 → <code>SEG_INTENSITY</code>(0~15) 조정<br>
+  · MAX7219 연결 후 ST7789나 SD가 이상해짐 → 알려주세요</div>
+  <div class="rec">결과 <input type="text" data-rec="c4" placeholder="예) 정상 / 레벨시프터 필요"></div>
+</div>
+
+<div class="item" data-sec="C"><input type="checkbox" id="c5">
+  <label class="ttl" for="c5">⑤ HX711 + 로드셀 — 감도 측정 <span class="tag must">값 기록</span></label>
+  <div class="why">손 올림을 판정하는 기준값 <code>TRIGGER_THRESHOLD</code>(기본 8000)는 실측값을 보고 정해야 합니다.</div>
+  <div class="how"><b>방법:</b> 원판까지 조립한 상태로 리셋합니다(부팅 시 영점을 잡으므로 이때 손대지 마세요). 정보 LCD의 <code>raw</code> 값과 시리얼 로그를 보며 아래 세 값을 기록합니다.<br>
+  (1) 아무것도 안 올렸을 때 raw 값이 흔들리는 폭<br>
+  (2) 손을 가볍게 얹었을 때의 raw 값<br>
+  (3) 꾹 눌렀을 때의 raw 값<br>
+  <b>설정 기준:</b> TRIGGER는 (1)보다 충분히 크고 (2)보다 작게, 보통 (2)의 절반 정도로 잡습니다. RELEASE는 TRIGGER의 절반으로 둡니다.</div>
+  <div class="ifnot"><b>값이 전혀 안 변하면:</b> E+/E-/A+/A- 배선과 HX711 VCC(3.3V)를 확인합니다. <b>부팅마다 <code>HX711 ERR</code>가 뜨면:</b> DT='17', SCK='38' 핀을 다시 확인합니다.</div>
+  <div class="rec">(1) 노이즈 <input type="text" data-rec="c5a" placeholder="± ___"></div>
+  <div class="rec">(2) 가볍게 <input type="text" data-rec="c5b" placeholder="___"></div>
+  <div class="rec">(3) 꾹 누름 <input type="text" data-rec="c5c" placeholder="___"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2>D. 통합·전시 조건 테스트 <span class="cnt" data-sec="D"></span></h2>
+
+<div class="item" data-sec="D"><input type="checkbox" id="d1">
+  <label class="ttl" for="d1">전체 시나리오 반복 (50회 이상)</label>
+  <div class="how">손 올림 → 사진 전환과 룰렛 → 번호 확정 → 손 뗌 → <code>--------</code> 복귀. 오작동(손을 안 댔는데 반응 / 손을 댔는데 무반응)이 몇 번 나오는지 셉니다.</div>
+  <div class="rec">결과 <input type="text" data-rec="d1" placeholder="___회 중 오작동 ___회"></div>
+</div>
+
+<div class="item" data-sec="D"><input type="checkbox" id="d2">
+  <label class="ttl" for="d2">어댑터 전원으로 장시간 구동 (1시간 이상)</label>
+  <div class="how">PC가 아닌 어댑터로만 켜 둡니다. 재부팅, 화면 깜빡임, 세그먼트 깨짐이 있는지, 시간이 지나며 영점이 틀어져 혼자 반응하는지 봅니다.</div>
+  <div class="ifnot"><b>재부팅이나 깜빡임이 있으면:</b> 어댑터 용량, 케이블 길이·품질을 확인하고 MAX7219 밝기를 낮춰 봅니다.</div>
+  <div class="rec">결과 <input type="text" data-rec="d2" placeholder="예) 2시간 이상 없음"></div>
+</div>
+
+<div class="item" data-sec="D"><input type="checkbox" id="d3">
+  <label class="ttl" for="d3">BOOT 버튼이 눌리지 않는 구조인지</label>
+  <div class="why">BOOT 버튼(GPIO0)이 MAX7219 CS를 겸합니다. 동작 중에 눌리면 세그먼트 표시가 잠깐 깨질 수 있습니다(5초 안에 자동 복구).</div>
+  <div class="how">케이스나 프레임에 조립했을 때 BOOT/RESET 버튼이 눌리지 않는지 확인합니다.</div>
+</div>
+
+<!-- ============================================================ -->
+<h2>E. 작가님·팀과 정할 것 <span class="cnt" data-sec="E"></span></h2>
+
+<div class="item" data-sec="E"><input type="checkbox" id="e1">
+  <label class="ttl" for="e1">터치 기능을 쓰지 않는 것으로 확정</label>
+  <div class="why">현재 배선은 터치 칩의 핀을 재활용하므로 터치가 꺼집니다. 나중에 터치가 필요해지면 배선 재설계가 필요합니다.</div>
+  <div class="rec">결정 <input type="text" data-rec="e1" placeholder="예) 터치 미사용 확정 (날짜)"></div>
+</div>
+
+<div class="item" data-sec="E"><input type="checkbox" id="e2">
+  <label class="ttl" for="e2">2.8" 화면에 무엇을 보여줄지</label>
+  <div class="why">지금은 상태 · 하중 막대 · 확정 번호 · 사진 파일명이 나옵니다. 관람객용 연출인지, 설치·점검용 화면인지 정해야 합니다.</div>
+  <div class="rec">결정 <input type="text" data-rec="e2" placeholder=""></div>
+</div>
+
+<div class="item" data-sec="E"><input type="checkbox" id="e3">
+  <label class="ttl" for="e3">부저 효과음이 필요한지</label>
+  <div class="why">필요하면 B-3(GPIO18 연결) 결과에 따라 결정합니다. 미연결이면 시리얼(TX)을 포기하고 GPIO43을 쓰는 방법이 남습니다.</div>
+  <div class="rec">결정 <input type="text" data-rec="e3" placeholder=""></div>
+</div>
+
+<div class="item" data-sec="E"><input type="checkbox" id="e4">
+  <label class="ttl" for="e4">사진 사양 (해상도 · 장수 · 세로 사진 처리)</label>
+  <div class="why">800×480이 아닌 사진은 비율을 유지한 채 화면에 맞추고, 남는 부분은 검은 여백으로 둡니다. 코드상 최대 200장입니다.</div>
+  <div class="rec">결정 <input type="text" data-rec="e4" placeholder=""></div>
+</div>
+
+<p class="sub" style="margin-top:28px">확인 결과(특히 A-2, B-1, C-3, C-5의 값)를 알려주시면 코드와 배선도에 반영합니다.</p>
+</main>
+
+<script>
+(function(){
+  var KEY = "viewe-checklist-v1";
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { state = {}; }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.item input[type=checkbox]'));
+  var recs  = Array.prototype.slice.call(document.querySelectorAll('input[data-rec]'));
+
+  function update(){
+    var done = 0;
+    boxes.forEach(function(b){
+      b.closest('.item').classList.toggle('done', b.checked);
+      if (b.checked) done++;
+    });
+    document.getElementById('prog').style.width = (boxes.length ? done / boxes.length * 100 : 0) + '%';
+    document.getElementById('progtxt').textContent = '진행 ' + done + ' / ' + boxes.length;
+    document.querySelectorAll('.cnt[data-sec]').forEach(function(c){
+      var sec = c.getAttribute('data-sec');
+      var items = document.querySelectorAll('.item[data-sec="' + sec + '"] input[type=checkbox]');
+      var d = 0; items.forEach(function(i){ if (i.checked) d++; });
+      c.textContent = d + ' / ' + items.length;
+    });
+  }
+
+  boxes.forEach(function(b){
+    if (state['c:' + b.id] !== undefined) b.checked = state['c:' + b.id];
+    else if (b.id === 'a1') b.checked = true;   // WB-B 확인 완료
+    b.addEventListener('change', function(){ state['c:' + b.id] = b.checked; save(); update(); });
+  });
+  recs.forEach(function(r){
+    var k = 'r:' + r.getAttribute('data-rec');
+    if (state[k]) r.value = state[k];
+    r.addEventListener('input', function(){ state[k] = r.value; save(); });
+  });
+  document.getElementById('reset').addEventListener('click', function(){
+    if (!confirm('체크와 기록을 모두 지울까요?')) return;
+    state = {}; save();
+    boxes.forEach(function(b){ b.checked = (b.id === 'a1'); });
+    recs.forEach(function(r){ r.value = ''; });
+    update();
+  });
+  update();
+})();
+</script>
+</body>
+</html>

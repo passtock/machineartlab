@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIEWE 통합 배선도</title>
+<style>
+:root{
+  --bg:#f7f7f5; --card:#ffffff; --ink:#1d1f23; --muted:#626873; --line:#d9dbe0;
+  --board:#1f4fa8; --board-ink:#eaf1ff; --pin-used:#ffb020; --pin-busy:#8b93a3; --pin-pwr:#e5484d;
+  --w-mosi:#e8590c; --w-sclk:#d6a400; --w-cs:#2b8a3e; --w-dc:#1971c2; --w-seg:#9c36b5;
+  --w-hx:#0c8599; --w-hxsck:#c2255c; --w-5v:#e03131; --w-3v3:#f06595; --w-gnd:#343a40; --warn-bg:#fff4e0; --warn-ink:#8a4b00; --ok-bg:#e9f7ee; --ok-ink:#1e6b3a;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15171b; --card:#1d2026; --ink:#e7e9ee; --muted:#9aa1ad; --line:#323743;
+    --board:#24477f; --board-ink:#dfe8ff; --pin-busy:#6b7385; --w-gnd:#ced4da;
+    --warn-bg:#3a2c12; --warn-ink:#ffd18a; --ok-bg:#16301f; --ok-ink:#9fe0b5;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15171b; --card:#1d2026; --ink:#e7e9ee; --muted:#9aa1ad; --line:#323743;
+  --board:#24477f; --board-ink:#dfe8ff; --pin-busy:#6b7385; --w-gnd:#ced4da;
+  --warn-bg:#3a2c12; --warn-ink:#ffd18a; --ok-bg:#16301f; --ok-ink:#9fe0b5;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+main{max-width:1080px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:19px;margin:36px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+h3{font-size:16px;margin:22px 0 8px}
+.sub{color:var(--muted);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.note{border-radius:10px;padding:12px 14px;margin:10px 0}
+.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:560px;background:var(--card);border-radius:10px;overflow:hidden}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600;background:color-mix(in srgb,var(--card) 85%,var(--line))}
+td code,p code,li code{font-family:ui-monospace,Consolas,monospace;font-size:13px;background:color-mix(in srgb,var(--card) 80%,var(--line));padding:1px 5px;border-radius:4px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px}
+.tag{display:inline-block;font-size:12px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.tag.use{border-color:var(--pin-used);color:var(--ink);background:color-mix(in srgb,var(--pin-used) 22%,transparent)}
+.tag.pwr{border-color:var(--pin-pwr);color:var(--ink);background:color-mix(in srgb,var(--pin-pwr) 18%,transparent)}
+.diagram{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px;overflow-x:auto}
+.diagram svg{display:block;width:100%;min-width:760px;height:auto}
+ol li,ul li{margin:4px 0}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);margin:8px 4px 0}
+@media print{body{background:#fff}.diagram,.card,table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<main>
+<h1>VIEWE 4.3" 통합 배선표 및 다이어그램</h1>
+<p class="sub">머신아트랩 · 박건 작가님 · 보드 VIEWE UEDX80480043E-<b>WB-B</b> (ESP32-S3 N16R8) · 펌웨어 <code>Interactive_VIEWE/</code> · 실물 확인 항목은 <a href="확인사항_체크리스트.html" style="color:inherit;font-weight:700">확인사항_체크리스트.html</a></p>
+
+<div class="grid">
+  <div class="card"><b>구성</b><br>① 온보드 4.3" 800×480 화면 + MicroSD<br>② 2.8" ST7789 240×320 정보 LCD<br>③ MAX7219 8자리 7세그먼트<br>④ 5kg 로드셀 + HX711</div>
+  <div class="card"><b>핵심 원칙</b><br>· 온보드 화면이 J3 대부분과 J2의 4·5·6·7·15·16번을 사용<br>· SPI 버스(11, 12번)를 SD·ST7789·MAX7219가 <b>공유</b>하고 CS만 분리<br>· 이 작품은 <b>터치를 쓰지 않으므로</b> 터치용 38·19·20번을 재활용</div>
+  <div class="card"><b>유지되는 기능</b><br>· MicroSD 랜덤 사진 ✔<br>· USB 업로드 / 시리얼 모니터(TX·RX) ✔<br>· 정전식 터치 ✘ (사용 안 함)<br>· 부저 ✘ (남는 핀 없음, 아래 옵션 참고)</div>
+</div>
+
+<h2>1. 배선 다이어그램</h2>
+<div class="diagram">
+<svg viewBox="0 0 1040 720" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard, Malgun Gothic, sans-serif" role="img" aria-label="VIEWE WB-B 보드와 부품 배선 다이어그램">
+  <defs>
+    <style>
+      .box{fill:var(--card);stroke:var(--ink);stroke-width:1.4}
+      .t{fill:var(--ink);font-size:12px}
+      .tm{fill:var(--muted);font-size:11px}
+      .tb{fill:var(--ink);font-size:14px;font-weight:700}
+      .bt{fill:var(--board-ink);font-size:11px}
+      .btb{fill:var(--board-ink);font-size:14px;font-weight:700}
+      .w{fill:none;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+      .p5{fill:none;stroke:var(--w-5v);stroke-width:3.2;stroke-linejoin:round}
+      .p3{fill:none;stroke:var(--w-3v3);stroke-width:3.2;stroke-linejoin:round;stroke-dasharray:7 4}
+      .pg{fill:none;stroke:var(--w-gnd);stroke-width:3.2;stroke-linejoin:round}
+      .rl{font-size:11px;font-weight:700}
+    </style>
+  </defs>
+
+  <!-- ===== 전원 레일 (J3 19·20·21번 → 위로 돌아 왼쪽 부품으로) ===== -->
+  <path class="p5" d="M710 530 H784 V14 H236 V340"/>
+  <path class="pg" d="M710 510 H772 V26 H250 V510"/>
+  <path class="p3" d="M710 490 H760 V38 H264 V490"/>
+  <rect x="300" y="4" width="128" height="14" fill="var(--card)"/>
+  <text x="304" y="15" class="rl" fill="var(--w-5v)">5V · J3 '5V' 21번</text>
+  <rect x="440" y="18" width="138" height="14" fill="var(--card)"/>
+  <text x="444" y="29" class="rl" fill="var(--w-gnd)">GND · J3 'GND' 20번</text>
+  <rect x="590" y="30" width="146" height="14" fill="var(--card)"/>
+  <text x="594" y="41" class="rl" fill="var(--w-3v3)">3.3V · J3 '3.3V' 19번</text>
+
+  <!-- ===== Board ===== -->
+  <rect x="400" y="50" width="330" height="500" rx="14" fill="var(--board)"/>
+  <text x="565" y="74" text-anchor="middle" class="btb">VIEWE 4.3" WB-B (뒷면)</text>
+  <text x="565" y="92" text-anchor="middle" class="bt">ESP32-S3 · 온보드 RGB 화면 · MicroSD</text>
+  <text x="420" y="118" class="bt" text-anchor="middle" font-weight="700">J2</text>
+  <text x="710" y="118" class="bt" text-anchor="middle" font-weight="700">J3</text>
+
+  <!-- USB-C 포트 (실물 배치: 왼쪽 USB, 오른쪽 UART) -->
+  <rect x="478" y="541" width="52" height="18" rx="5" fill="var(--pin-busy)"/>
+  <text x="504" y="554" text-anchor="middle" class="bt" font-size="10">USB</text>
+  <rect x="548" y="541" width="52" height="18" rx="5" fill="var(--w-5v)"/>
+  <text x="574" y="554" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">UART</text>
+  <text x="504" y="574" text-anchor="middle" class="tm">사용 안 함</text>
+
+  <!-- 어댑터 + 케이블 -->
+  <path d="M574 559 V650" fill="none" stroke="var(--muted)" stroke-width="6" stroke-linecap="round"/>
+  <rect x="490" y="650" width="168" height="54" rx="8" class="box"/>
+  <text x="574" y="673" text-anchor="middle" class="tb">5V 2A 이상 어댑터</text>
+  <text x="574" y="692" text-anchor="middle" class="tm">USB-C 케이블 → UART 포트</text>
+  <text x="586" y="630" class="tm">전원 · 업로드 · 시리얼</text>
+
+  <!-- ===== ST7789 ===== -->
+  <rect x="40" y="70" width="180" height="232" rx="8" class="box"/>
+  <text x="50" y="92" class="tb">② 2.8" ST7789</text>
+  <text x="50" y="108" class="tm">240×320 (YwRobot)</text>
+  <g class="t" text-anchor="end">
+    <text x="212" y="134">VCC</text><text x="212" y="154">GND</text><text x="212" y="174">CS</text>
+    <text x="212" y="194">RESET</text><text x="212" y="214">DC</text><text x="212" y="234">SDI(MOSI)</text>
+    <text x="212" y="254">SCK</text><text x="212" y="274">LED(BLK)</text>
+    <text x="212" y="294" fill="var(--muted)">SDO · 미연결</text>
+  </g>
+
+  <!-- ===== MAX7219 ===== -->
+  <rect x="40" y="318" width="180" height="114" rx="8" class="box"/>
+  <text x="50" y="338" class="tb">③ MAX7219</text>
+  <g class="t" text-anchor="end">
+    <text x="212" y="344">VCC</text><text x="212" y="364">GND</text><text x="212" y="384">DIN</text>
+    <text x="212" y="404">CS(LOAD)</text><text x="212" y="424">CLK</text>
+  </g>
+
+  <!-- ===== HX711 + Load cell ===== -->
+  <rect x="130" y="450" width="90" height="114" rx="8" class="box"/>
+  <text x="140" y="470" class="tb">④ HX711</text>
+  <g class="t" text-anchor="end">
+    <text x="212" y="494">VCC</text><text x="212" y="514">GND</text><text x="212" y="534">DT</text><text x="212" y="554">SCK</text>
+  </g>
+  <g class="tm"><text x="136" y="494">E+</text><text x="136" y="510">E-</text><text x="136" y="526">A-</text><text x="136" y="542">A+</text></g>
+  <rect x="20" y="478" width="70" height="72" rx="6" class="box"/>
+  <text x="55" y="510" text-anchor="middle" class="t">로드셀</text>
+  <text x="55" y="526" text-anchor="middle" class="tm">5kg</text>
+  <path class="w" stroke="#e03131" d="M90 490 H130"/>
+  <path class="w" stroke="#495057" d="M90 506 H130"/>
+  <path class="w" stroke="#adb5bd" d="M90 522 H130"/>
+  <path class="w" stroke="#2f9e44" d="M90 538 H130"/>
+  <g class="tm" font-size="9.5"><text x="94" y="486">빨</text><text x="94" y="502">검</text><text x="94" y="518">흰</text><text x="94" y="534">초</text></g>
+
+  <!-- ===== 전원 탭 (부품 → 레일) ===== -->
+  <path class="p5" d="M220 130 H236"/><circle cx="236" cy="130" r="4" fill="var(--w-5v)"/>
+  <path class="p5" d="M220 340 H236"/>
+  <path class="pg" d="M220 150 H250"/><circle cx="250" cy="150" r="4" fill="var(--w-gnd)"/>
+  <path class="pg" d="M220 360 H250"/><circle cx="250" cy="360" r="4" fill="var(--w-gnd)"/>
+  <path class="pg" d="M220 510 H250"/>
+  <path class="p3" d="M220 190 H264"/><circle cx="264" cy="190" r="4" fill="var(--w-3v3)"/>
+  <path class="p3" d="M220 270 H264"/><circle cx="264" cy="270" r="4" fill="var(--w-3v3)"/>
+  <path class="p3" d="M220 490 H264"/>
+
+  <!-- ===== 신호선 ===== -->
+  <path class="w" stroke="var(--w-mosi)" d="M220 230 H300 V380 H220 M300 330 H420"/>
+  <circle cx="300" cy="330" r="3.5" fill="var(--w-mosi)"/>
+  <path class="w" stroke="var(--w-sclk)" d="M220 250 H320 V420 H220 M320 350 H420"/>
+  <circle cx="320" cy="350" r="3.5" fill="var(--w-sclk)"/>
+  <path class="w" stroke="var(--w-cs)" d="M220 170 H360 V450 H420"/>
+  <path class="w" stroke="var(--w-dc)" d="M220 210 H345 V430 H420"/>
+  <path class="w" stroke="var(--w-hx)" d="M220 530 H385 V290 H420"/>
+  <path class="w" stroke="var(--w-hxsck)" d="M220 550 H372 V410 H420"/>
+  <path class="w" stroke="var(--w-seg)" d="M220 400 H282 V600 H808 V430 H710"/>
+
+  <!-- ===== 안내 박스 ===== -->
+  <rect x="830" y="70" width="200" height="228" rx="8" class="box"/>
+  <text x="840" y="92" class="tb">전원 연결</text>
+  <g class="t">
+    <text x="840" y="116">① 어댑터 → <tspan font-weight="700">UART</tspan> USB-C</text>
+    <text x="840" y="140" fill="var(--w-5v)" font-weight="700">5V · J3 '5V'(21번)</text>
+    <text x="840" y="158">　→ ST7789 VCC</text>
+    <text x="840" y="176">　→ MAX7219 VCC</text>
+    <text x="840" y="200" fill="var(--w-3v3)" font-weight="700">3.3V · J3 '3.3V'(19번)</text>
+    <text x="840" y="218">　→ HX711 VCC</text>
+    <text x="840" y="236">　→ ST7789 RESET · LED</text>
+    <text x="840" y="260" font-weight="700">GND · J3 'GND'(20번)</text>
+    <text x="840" y="278">　→ 세 부품 GND 전부</text>
+  </g>
+
+  <rect x="830" y="318" width="200" height="200" rx="8" class="box"/>
+  <text x="840" y="340" class="tb">연결하지 않는 것</text>
+  <g class="t">
+    <text x="840" y="364">· ST7789 SDO(MISO)</text>
+    <text x="840" y="382">· ST7789 모듈의 TF 슬롯 핀</text>
+    <text x="840" y="400">· 보드의 'USB' 포트</text>
+    <text x="840" y="418">· J2 '18'(14번), 'VBUS'(21번)</text>
+    <text x="840" y="436">· J2 TX / RX (시리얼용)</text>
+    <text x="840" y="454">· J3 1~15번 (화면 신호)</text>
+    <text x="840" y="472">· J2 '4,5,6,7,15,16' (화면)</text>
+    <text x="840" y="490">· J2 '10','13' (온보드 SD)</text>
+  </g>
+</svg>
+</div>
+<div class="legend">
+  <span><span class="sw" style="background:var(--w-mosi)"></span>MOSI 공유 (GPIO11)</span>
+  <span><span class="sw" style="background:var(--w-sclk)"></span>SCLK 공유 (GPIO12)</span>
+  <span><span class="sw" style="background:var(--w-cs)"></span>ST7789 CS (GPIO19)</span>
+  <span><span class="sw" style="background:var(--w-dc)"></span>ST7789 DC (GPIO20)</span>
+  <span><span class="sw" style="background:var(--w-seg)"></span>MAX7219 CS (GPIO0)</span>
+  <span><span class="sw" style="background:var(--w-hx)"></span>HX711 DT (GPIO17)</span>
+  <span><span class="sw" style="background:var(--w-hxsck)"></span>HX711 SCK (GPIO38)</span>
+  <span><span class="sw" style="background:var(--w-5v)"></span>5V</span>
+  <span><span class="sw" style="background:var(--w-3v3)"></span>3.3V (점선)</span>
+  <span><span class="sw" style="background:var(--w-gnd)"></span>GND</span>
+  <span><span class="sw" style="background:var(--pin-busy)"></span>온보드 화면/SD가 사용 중</span>
+</div>
+
+<h2>2. 배선표</h2>
+<p>다이어그램의 <code>9번 '17'</code>은 "위에서 9번째 핀, 실크 인쇄 글자 17"이라는 뜻입니다. 보드 뒷면 헤더의 <b>실크 인쇄 글자</b>를 보고 꽂으면 됩니다. 번호는 위(3.3V)에서부터 센 물리적 순서입니다.</p>
+
+<h3>② 2.8" ST7789 정보 LCD</h3>
+<div class="tablewrap"><table>
+<tr><th>모듈 핀</th><th>보드 헤더 (실크 글자)</th><th>GPIO</th><th>비고</th></tr>
+<tr><td>VCC</td><td><span class="tag pwr">5V</span></td><td>–</td><td>제품 사양 5V. 3.3V로도 켜지는 모듈이 많지만 5V 권장</td></tr>
+<tr><td>GND</td><td><span class="tag pwr">GND</span></td><td>–</td><td></td></tr>
+<tr><td>CS</td><td><span class="tag use">J2 '19' (17번)</span></td><td>19</td><td>터치 SDA 핀 재활용</td></tr>
+<tr><td>RESET (RST)</td><td><span class="tag pwr">3.3V</span></td><td>–</td><td>고정. 소프트웨어 리셋 사용</td></tr>
+<tr><td>DC (RS / A0)</td><td><span class="tag use">J2 '20' (16번)</span></td><td>20</td><td>터치 SCL 핀 재활용</td></tr>
+<tr><td>SDI / MOSI / SDA</td><td><span class="tag use">J2 '11' (11번)</span></td><td>11</td><td><b>공유</b> — MAX7219 DIN과 같은 핀</td></tr>
+<tr><td>SCK / SCL / CLK</td><td><span class="tag use">J2 '12' (12번)</span></td><td>12</td><td><b>공유</b> — MAX7219 CLK와 같은 핀</td></tr>
+<tr><td>LED / BLK</td><td><span class="tag pwr">3.3V</span></td><td>–</td><td>백라이트 상시 켜짐</td></tr>
+<tr><td>SDO / MISO</td><td>연결 안 함</td><td>–</td><td>SD카드 MISO와 충돌 방지</td></tr>
+<tr><td>SD_CS 등 TF 슬롯 핀</td><td>연결 안 함</td><td>–</td><td>사진은 보드 온보드 슬롯 사용</td></tr>
+</table></div>
+
+<h3>③ MAX7219 8자리 7세그먼트</h3>
+<div class="tablewrap"><table>
+<tr><th>모듈 핀</th><th>보드 헤더 (실크 글자)</th><th>GPIO</th><th>비고</th></tr>
+<tr><td>VCC</td><td><span class="tag pwr">5V</span></td><td>–</td><td>MAX7219 동작전압 4~5.5V</td></tr>
+<tr><td>GND</td><td><span class="tag pwr">GND</span></td><td>–</td><td></td></tr>
+<tr><td>DIN</td><td><span class="tag use">J2 '11' (11번)</span></td><td>11</td><td><b>공유</b> MOSI</td></tr>
+<tr><td>CS / LOAD</td><td><span class="tag use">J3 '0' (16번)</span></td><td>0</td><td>BOOT 버튼 핀. 동작 중 BOOT 버튼은 누르지 말 것</td></tr>
+<tr><td>CLK</td><td><span class="tag use">J2 '12' (12번)</span></td><td>12</td><td><b>공유</b> SCLK</td></tr>
+</table></div>
+
+<h3>④ HX711 + 로드셀</h3>
+<div class="tablewrap"><table>
+<tr><th>모듈 핀</th><th>보드 헤더 (실크 글자)</th><th>GPIO</th><th>비고</th></tr>
+<tr><td>VCC</td><td><span class="tag pwr">3.3V</span></td><td>–</td><td>3.3V로 구동해야 DT 출력이 3.3V 레벨</td></tr>
+<tr><td>GND</td><td><span class="tag pwr">GND</span></td><td>–</td><td></td></tr>
+<tr><td>DT (DOUT)</td><td><span class="tag use">J2 '17' (9번)</span></td><td>17</td><td>공식 'Free' 핀</td></tr>
+<tr><td>SCK</td><td><span class="tag use">J2 '38' (15번)</span></td><td>38</td><td>터치 리셋 핀 재활용 → 터치 칩은 꺼진 상태 유지</td></tr>
+<tr><td>E+ / E- / A- / A+</td><td colspan="3">로드셀 빨강 / 검정 / 흰색 / 초록 (일반 색상 기준, 키트 설명서 우선)</td></tr>
+</table></div>
+
+<h3>온보드 (배선 불필요)</h3>
+<div class="tablewrap"><table>
+<tr><th>장치</th><th>GPIO</th><th>비고</th></tr>
+<tr><td>4.3" RGB 화면</td><td>1·3·4·5·6·7·8·9·14·15·16·21·39·40·41·42·45·46·47·48, 백라이트 2</td><td>J3 1~15번, J2 '4~7, 15, 16'에 노출되어 있지만 <b>절대 다른 용도로 쓰지 말 것</b></td></tr>
+<tr><td>MicroSD</td><td>CS 10 · MOSI 11 · SCLK 12 · MISO 13</td><td>FAT32, <code>/images</code> 폴더에 JPEG</td></tr>
+<tr><td>USB-시리얼 (CH340)</td><td>TX 43 · RX 44</td><td>업로드·시리얼 모니터용. 그대로 둠</td></tr>
+</table></div>
+
+<h2>3. 헤더 전체 핀 지도</h2>
+<div class="tablewrap"><table id="hdr">
+<tr><th>번호</th><th>J2 실크</th><th>J2 용도</th><th>J3 실크</th><th>J3 용도</th></tr>
+</table></div>
+
+<h2>4. 주의 사항</h2>
+<div class="note warn"><b>5V 전원 (WB-B).</b> 보드는 <b>UART</b> 표시 USB-C 포트로 전원을 넣고, MAX7219·ST7789의 VCC는 <b>J3 '5V'(21번)</b>에서 가져갑니다. 두 USB-C 포트의 VBUS는 회로도상 모두 보드 내부 5V 레일(USB-5V)로 모입니다. 다만 21번 핀은 회로도(20핀 버전)에 나오지 않으므로, <b>부품을 꽂기 전에 보드만 USB로 켠 상태에서 멀티미터로 J3 '5V'–GND 사이가 약 5V인지 확인하세요.</b><br><br>
+<b>전류.</b> 4.3" 백라이트 포함 보드 약 0.3~0.5A, MAX7219 8자리 최대 약 0.3A, 2.8" LCD 약 0.1A로 합계 최대 1A 가까이 됩니다. PC USB 포트(0.5A)로는 부족할 수 있으니, 전시용으로는 <b>5V 2A 이상 어댑터</b>와 데이터 겸용이 아닌 짧은 고품질 USB-C 케이블을 권장합니다. 업로드할 때만 PC에 연결하세요.</div>
+<div class="note warn"><b>MAX7219 로직 레벨.</b> 5V로 구동하는 MAX7219의 입력 HIGH 기준은 3.5V라서 ESP32의 3.3V 신호로는 아슬아슬합니다. 보통은 동작하지만 숫자가 깨지거나 안 켜지면, MAX7219로 가는 DIN·CLK·CS 3가닥에만 <b>74AHCT125</b> 레벨시프터를 넣으세요. SD와 ST7789 쪽 배선은 그대로 둡니다.</div>
+<div class="note warn"><b>J2 '18'(14번)은 쓰지 않습니다.</b> 회로도상 이 핀은 터치 INT(CTP_INT)이고, GPIO18과는 저항 R33(미장착일 수 있음)을 거쳐야만 연결됩니다. 부저를 달고 싶으면 멀티미터로 J2 14번과 GPIO18이 통전되는지 확인한 뒤, <code>pins.h</code>의 <code>PIN_BUZZER</code>를 18로 바꾸세요.</div>
+<div class="note warn"><b>터치는 비활성화됩니다.</b> 터치 칩의 리셋 핀(GPIO38)을 HX711 SCK로 쓰기 때문입니다. 나중에 터치가 필요해지면 배선을 다시 설계해야 합니다.</div>
+<div class="note ok"><b>점퍼선 길이.</b> SPI 공유선(11, 12번)은 짧을수록 좋습니다(20cm 이내 권장). 화면이 깨지면 <code>lgfx_displays.h</code>의 <code>freq_write</code>를 27MHz에서 20MHz로 낮추세요.</div>
+
+<h2>5. 연결·테스트 순서 (하나씩)</h2>
+<ol>
+  <li><b>보드만 연결하고 업로드</b> — 4.3" 화면에 "SD Card Error!"가 나오면 정상입니다(아직 카드 없음). 시리얼 모니터에 <code>[HX711] 응답 없음</code>이 나오는 것도 정상입니다.</li>
+  <li><b>MicroSD 삽입</b> — FAT32로 포맷하고 <code>/images/*.jpg</code>(800×480 권장)를 넣은 뒤 리셋하면 사진이 뜹니다.</li>
+  <li><b>2.8" ST7789 연결</b> — "MACHINE ART LAB" 헤더와 READY 상태가 보이면 정상입니다. 색이 반전되면 <code>invert</code>를, 빨강·파랑이 바뀌면 <code>rgb_order</code>를 수정하세요.</li>
+  <li><b>MAX7219 연결</b> — 부팅할 때 <code>88888888</code>, 그 뒤 <code>--------</code>가 표시되면 정상입니다.</li>
+  <li><b>HX711 + 로드셀 연결</b> — 정보 LCD의 LOAD 바와 raw 값이 손으로 누를 때 움직이면 정상입니다. 반응 기준은 <code>main.cpp</code>의 <code>TRIGGER_THRESHOLD</code>(기본 8000)로 조정합니다.</li>
+</ol>
+<p>업로드: VS Code에서 PlatformIO로 <code>Interactive_VIEWE</code> 폴더를 열고 Upload를 누르거나, 아래 명령을 실행하세요. 보드의 <b>UART</b> 표시 USB-C 포트에 연결해야 합니다.<br>
+<code>pio run -d Interactive_VIEWE -t upload</code></p>
+
+<p class="sub" style="margin-top:30px">근거 자료: VIEWE UEDX80480043E-WB-B V1.0 SPEC · 회로도 (WB-A V3.2 SPEC / V1.3 회로도로 교차 확인), ESP32_Display_Panel BOARD_VIEWE_UEDX80480043E_WB_A 설정</p>
+</main>
+
+<script>
+(function(){
+  var J2 = [
+    ["3.3V","전원 3.3V","pwr"],["RST","EN (리셋)","busy"],["4","화면 G5","busy"],["5","화면 G0","busy"],
+    ["6","화면 G1","busy"],["7","화면 G2","busy"],["15","화면 G3","busy"],["16","화면 G4","busy"],
+    ["17","HX711 DT","use"],["10","SD CS (온보드)","busy"],["11","MOSI 공유","use"],["12","SCLK 공유","use"],
+    ["13","SD MISO (온보드)","busy"],["18","CTP_INT — 사용 안 함","free"],["38","HX711 SCK","use"],["20","ST7789 DC","use"],
+    ["19","ST7789 CS","use"],["TX","시리얼 TX","busy"],["RX","시리얼 RX","busy"],["GND","GND","pwr"],["VBUS","5V (VBUS)","pwr"]
+  ];
+  var J3 = [
+    ["1","화면 B4","busy"],["2","화면 백라이트","busy"],["42","화면 PCLK","busy"],["41","화면 VSYNC","busy"],
+    ["40","화면 DE","busy"],["39","화면 HSYNC","busy"],["3","화면 B1","busy"],["46","화면 B2","busy"],
+    ["9","화면 B3","busy"],["8","화면 B0","busy"],["45","화면 R0","busy"],["48","화면 R1","busy"],
+    ["47","화면 R2","busy"],["21","화면 R3","busy"],["14","화면 R4","busy"],["0","MAX7219 CS","use"],
+    ["LEDK","백라이트 -","busy"],["LEDA","백라이트 +","busy"],["3.3V","전원 3.3V","pwr"],["GND","GND","pwr"],["5V","5V → MAX7219·ST7789 VCC","pwr"]
+  ];
+  var color = {use:"var(--pin-used)", busy:"var(--pin-busy)", pwr:"var(--pin-pwr)", free:"transparent"};
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.querySelector(".diagram svg");
+  function pinRow(list, x, labelX, anchor){
+    list.forEach(function(p, i){
+      var y = 130 + i*20;
+      var c = document.createElementNS(NS,"circle");
+      c.setAttribute("cx",x); c.setAttribute("cy",y); c.setAttribute("r",6);
+      c.setAttribute("fill", color[p[2]]);
+      c.setAttribute("stroke","var(--board-ink)"); c.setAttribute("stroke-width", i===20 ? 1 : 1.4);
+      if (i===20) c.setAttribute("stroke-dasharray","2 2");
+      svg.appendChild(c);
+      var t = document.createElementNS(NS,"text");
+      t.setAttribute("x",labelX); t.setAttribute("y",y+4); t.setAttribute("text-anchor",anchor);
+      t.setAttribute("class","bt");
+      if (p[2]==="use") t.setAttribute("font-weight","700");
+      t.textContent = (anchor==="start") ? (i+1)+"번  '"+p[0]+"'"+(p[2]==="use"?"  ← "+p[1]:"") : (p[2]==="use"?p[1]+" →  ":"")+"'"+p[0]+"'  "+(i+1)+"번";
+      svg.appendChild(t);
+    });
+  }
+  pinRow(J2, 420, 432, "start");
+  pinRow(J3, 710, 698, "end");
+
+  var tb = document.getElementById("hdr");
+  var cls = {use:"tag use", pwr:"tag pwr", busy:"tag", free:"tag"};
+  for (var i=0;i<21;i++){
+    var tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+(i+1)+""+"</td>"+
+      "<td><span class='"+cls[J2[i][2]]+"'>"+J2[i][0]+"</span></td><td>"+J2[i][1]+"</td>"+
+      "<td><span class='"+cls[J3[i][2]]+"'>"+J3[i][0]+"</span></td><td>"+J3[i][1]+"</td>";
+    tb.appendChild(tr);
+  }
+})();
+</script>
+</body>
+</html>
